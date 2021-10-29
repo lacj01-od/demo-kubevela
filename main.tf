@@ -2,24 +2,10 @@ provider "azurerm" {
   features {}
 }
 
-terraform {
-  backend "azurerm" {
-    storage_account_name = "terraform0aks0lab"
-    resource_group_name  = "terraform-aks-lab"
-    container_name       = "tfstate-aks-lab"
-    key                  = "test-kubevela.state"
-  }
-  required_providers {
-    azurerm = {
-      version = ">= 2.78.0"
-    }
-  }
-}
-
 resource "azurerm_network_interface" "gateway_public" {
   name                 = "${var.vm_name}interface"
-  location             = var.resource_group.location
-  resource_group_name  = var.resource_group.name
+  location             = data.azurerm_resource_group.resource_group.location
+  resource_group_name  = data.azurerm_resource_group.resource_group.name
   enable_ip_forwarding = false
 
   ip_configuration {
