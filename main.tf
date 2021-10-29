@@ -1,7 +1,3 @@
-provider "azurerm" {
-  features {}
-}
-
 resource "azurerm_network_interface" "gateway_public" {
   name                 = "${var.vm_name}interface"
   location             = data.azurerm_resource_group.resource_group.location
