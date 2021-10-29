@@ -1,28 +1,50 @@
-module "demo-module" {
-  source = "github.com/lacj01-od/demo-kubevela"
-  resource_group = var.resource_group
-  vm_name = var.vm_name
-  subnet_name = var.subnet_name
-  vnet_name = var.vnet_name
-  password = var.password
+provider "azurerm" {
+  features {}
 }
 
-variable "resource_group" {
-  type = string
+terraform {
+  backend "azurerm" {
+    storage_account_name = "terraform0aks0lab"
+    resource_group_name  = "terraform-aks-lab"
+    container_name       = "tfstate-aks-lab"
+    key                  = "test-kubevela.state"
+  }
+  required_providers {
+    azurerm = {
+      version = ">= 2.78.0"
+    }
+  }
 }
 
-variable "vm_name" {
-  type = string
+resource "azurerm_network_interface" "gateway_public" {
+  name                 = "${var.vm_name}interface"
+  location             = var.resource_group.location
+  resource_group_name  = var.resource_group.name
+  enable_ip_forwarding = false
+
+  ip_configuration {
+    name                          = "myconfig"
+    subnet_id                     = data.azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
 }
 
-variable "subnet_name" {
-  type = string
-}
-
-variable "vnet_name" {
-  type = string
-}
-
-variable "password" {
-  type = string
+resource "azurerm_linux_virtual_machine" "virtual_machine" {
+  location              = data.azurerm_resource_group.resource_group.location
+  name                  = var.vm_name
+  network_interface_ids = [azurerm_network_interface.gateway_public.id]
+  resource_group_name   = data.azurerm_resource_group.resource_group.name
+  admin_username        = "azureuser"
+  admin_password        = var.password
+  size                  = "Standard_B1ls"
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+  source_image_reference {
+    offer     = "0001-com-ubuntu-server-focal"
+    publisher = "Canonical"
+    version   = "latest"
+    sku       = "20_04-lts"
+  }
 }
