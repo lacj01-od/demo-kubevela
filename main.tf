@@ -18,6 +18,7 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
   resource_group_name   = data.azurerm_resource_group.resource_group.name
   admin_username        = "azureuser"
   admin_password        = var.password
+  disable_password_authentication = false
   size                  = "Standard_B1ls"
   os_disk {
     caching              = "ReadWrite"

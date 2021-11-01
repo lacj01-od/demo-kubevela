@@ -9,7 +9,7 @@ spec:
       properties:
         resource_group: "aks-lab-lacj01"
         vm_name: "myvm"
-        subnet_name: "gateway_private"
+        subnet_name: "gateway_internal"
         vnet_name: "virtual-network"
         password: "Passw0rd"
         writeConnectionSecretToRef:
